@@ -1,29 +1,31 @@
 import streamlit as st
-import os
-
-# ========== DIAGNÓSTICO — NÃO ALTERAR ==========
-# Carrega o .env e mostra se funcionou
-CHAVE_GROQ = os.getenv("GROQ_API_KEY")
-
-# Mostra status para diagnosticar
-if not CHAVE_GROQ:
-    st.error("❌ CHAVE NÃO ENCONTRADA!")
-    st.info("Verifique:")
-    st.code("1. O arquivo se chama exatamente .env")
-    st.code("2. Está na mesma pasta que assistente_groq.py")
-    st.code("3. Linha correta: GROQ_API_KEY=sua_chave_sem_aspas")
-    st.stop()
-else:
-    st.success(f"✅ Chave carregada! Começa com: {CHAVE_GROQ[:8]}...")
-# =============================================
-
 from groq import Groq
 import speech_recognition as sr
 import pyttsx3
 
-# Inicializar cliente
+# ==============================================
+# SÓ FUNCIONA COM SECRETS DO STREAMLIT CLOUD
+# NÃO PRECISA DE ARQUIVO .env!
+# ==============================================
+
+CHAVE_GROQ = None
+# Tenta pegar do Secrets do Streamlit
+if "GROQ_API_KEY" in st.secrets:
+    CHAVE_GROQ = st.secrets["GROQ_API_KEY"]
+
+if not CHAVE_GROQ:
+    st.error("❌ CHAVE NÃO CONFIGURADA!")
+    st.info("")
+    st.markdown("### Como resolver:")
+    st.markdown("1. Clique em **Manage app** ↘️ no canto inferior direito")
+    st.markdown("2. Vá na aba **Secrets**")
+    st.markdown("3. Clique em **+ Add secrets**")
+    st.markdown("4. Nome: `GROQ_API_KEY`")
+    st.markdown("5. Valor: cole sua chave que começa com `gsk_`")
+    st.markdown("6. Clique em **Save** e reinicie o app")
+    st.stop()
+
 cliente = Groq(api_key=CHAVE_GROQ)
-# Troque ESTA linha no seu código:
 MODELO = "openai/gpt-oss-20b"
 
 # Configuração da página
@@ -47,8 +49,8 @@ def falar_resposta(texto):
         engine.say(texto)
         engine.runAndWait()
         engine.stop()
-    except Exception as erro:
-        st.warning(f"Não consegui falar: {erro}")
+    except Exception:
+        st.info("🔊 Resposta falada disponível no computador. No celular use a leitura de tela.")
 
 def ouvir_usuario():
     reconhecedor = sr.Recognizer()
