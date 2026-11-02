@@ -11,7 +11,7 @@ import pyttsx3
 # ==============================================
 
 # Pegar chave diretamente do Secrets do Streamlit
-CHAVE_GROQ = st.secrets.get("GROQ_API_KEY")
+CHAVE_GROQ = st.secrets.get("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")
 
 if not CHAVE_GROQ:
     st.error("❌ CHAVE NÃO CONFIGURADA!")
