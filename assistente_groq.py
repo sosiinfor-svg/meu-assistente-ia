@@ -1,24 +1,31 @@
 import streamlit as st
 import os
+from dotenv import load_dotenv
+
+# ========== DIAGNÓSTICO — NÃO ALTERAR ==========
+# Carrega o .env e mostra se funcionou
+load_dotenv()
+CHAVE_GROQ = os.getenv("GROQ_API_KEY")
+
+# Mostra status para diagnosticar
+if not CHAVE_GROQ:
+    st.error("❌ CHAVE NÃO ENCONTRADA!")
+    st.info("Verifique:")
+    st.code("1. O arquivo se chama exatamente .env")
+    st.code("2. Está na mesma pasta que assistente_groq.py")
+    st.code("3. Linha correta: GROQ_API_KEY=sua_chave_sem_aspas")
+    st.stop()
+else:
+    st.success(f"✅ Chave carregada! Começa com: {CHAVE_GROQ[:8]}...")
+# =============================================
+
 from groq import Groq
 import speech_recognition as sr
 import pyttsx3
 
-# ==============================================
-# CONFIGURAÇÃO — NÃO USE MAIS O ARQUIVO .env
-# No Streamlit Cloud: vá em Secrets e coloque:
-# GROQ_API_KEY = sua_chave_aqui
-# ==============================================
-
-# Pegar chave diretamente do Secrets do Streamlit
-CHAVE_GROQ = st.secrets.get("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")
-
-if not CHAVE_GROQ:
-    st.error("❌ CHAVE NÃO CONFIGURADA!")
-    st.info("Vá em Manage app → Secrets → adicione GROQ_API_KEY")
-    st.stop()
-
+# Inicializar cliente
 cliente = Groq(api_key=CHAVE_GROQ)
+# Troque ESTA linha no seu código:
 MODELO = "openai/gpt-oss-20b"
 
 # Configuração da página
@@ -27,7 +34,7 @@ st.set_page_config(
     page_icon="⚡",
     layout="wide"
 )
-st.title("⚡ Assistente de IA — Groq")
+st.title("⚡ Assistente de IA")
 
 # Inicializar histórico
 if "historico" not in st.session_state:
@@ -43,7 +50,7 @@ def falar_resposta(texto):
         engine.runAndWait()
         engine.stop()
     except Exception as erro:
-        st.warning(f"⚠️ Fala indisponível no navegador: {erro}")
+        st.warning(f"Não consegui falar: {erro}")
 
 def ouvir_usuario():
     reconhecedor = sr.Recognizer()
@@ -108,15 +115,15 @@ if entrada:
     if st.checkbox("🔊 Ouvir resposta", key=f"voz_{len(st.session_state.historico)}"):
         falar_resposta(resp)
 
-if st.button("🎙️ Falar com o assistente", type="primary"):
+if st.button("Falar com o assistente", type="primary"):
     pergunta_voz = ouvir_usuario()
     resp_voz = processar_pergunta(pergunta_voz)
     if resp_voz and not resp_voz.startswith("❌"):
         falar_resposta(resp_voz)
 
-if st.button("🗑️ Nova conversa"):
+if st.button("Nova conversa"):
     st.session_state.historico = []
     st.rerun()
 
 st.divider()
-st.caption(f"⚡ Modelo: {MODELO} | Rodando no Streamlit Cloud")
+st.caption(f"⚡ Modelo: {MODELO}")
