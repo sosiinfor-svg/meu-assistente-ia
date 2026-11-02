@@ -115,13 +115,13 @@ if entrada:
     if st.checkbox("🔊 Ouvir resposta", key=f"voz_{len(st.session_state.historico)}"):
         falar_resposta(resp)
 
-if st.button("🎙️ Falar com o assistente", type="primary"):
+if st.button("Falar com o assistente", type="primary"):
     pergunta_voz = ouvir_usuario()
     resp_voz = processar_pergunta(pergunta_voz)
     if resp_voz and not resp_voz.startswith("❌"):
         falar_resposta(resp_voz)
 
-if st.button("🗑️ Nova conversa"):
+if st.button("Nova conversa"):
     st.session_state.historico = []
     st.rerun()
 
