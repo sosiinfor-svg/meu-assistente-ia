@@ -1,10 +1,8 @@
 import streamlit as st
 import os
-from dotenv import load_dotenv
 
 # ========== DIAGNÓSTICO — NÃO ALTERAR ==========
 # Carrega o .env e mostra se funcionou
-load_dotenv()
 CHAVE_GROQ = os.getenv("GROQ_API_KEY")
 
 # Mostra status para diagnosticar
